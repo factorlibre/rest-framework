@@ -29,9 +29,12 @@ def company_id() -> int | None:
 
 def odoo_env(company_id: Annotated[int | None, Depends(company_id)]) -> Environment:
     env = odoo_env_ctx.get()
-    if company_id is not None:
-        env = env(context=dict(env.context, allowed_company_ids=[company_id]))
-
+    if company_id:
+        allowed_company_ids = [company_id]
+    else:
+        user_id = env["res.users"].browse(env.uid)
+        allowed_company_ids = user_id.company_ids.ids
+    env = env(context=dict(env.context, allowed_company_ids=allowed_company_ids))
     yield env
 
 

@@ -1,6 +1,7 @@
 # Copyright 2022 ACSONE SA/NV
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/LGPL).
 
+import hashlib
 import logging
 from functools import partial
 from itertools import chain
@@ -149,7 +150,7 @@ class FastapiEndpoint(models.Model):
         options = options or self._default_endpoint_options()
         route = "|".join(routing["routes"])
         key = self._endpoint_registry_route_unique_key(routing)
-        endpoint_hash = hash(route)
+        endpoint_hash = hashlib.md5(route.encode("utf-8")).hexdigest()
         return self._endpoint_registry.make_rule(
             key, route, options, routing, endpoint_hash
         )
